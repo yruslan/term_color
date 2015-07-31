@@ -24,6 +24,8 @@
 #define CN_BOLD        32
 #define CN_UNDERLINE   64
 
+bool is_inside_terminal();
+
 void textcolor(int attr=CN_NORMAL, int fg=CN_NO_COLOR, int bg=CN_NO_COLOR);
 
 void textcolor_show();

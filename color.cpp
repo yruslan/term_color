@@ -4,8 +4,11 @@
 
 #ifdef WIN32
 #include <windows.h>
+#include <io.h>
 static HANDLE hConsole = NULL;
 static WORD hConsoleDefAttr = 0;
+#else
+#include <unistd.h>
 #endif
 
 //#define USE_ARCHAIC_TERM
@@ -76,8 +79,26 @@ static int GetSysConsoleColor(int nColor)
 	return nSysColor;
 }
 
+bool is_inside_terminal()
+{
+	static int g_IsTerminal = -1;
+	if (!g_IsTerminal) return false;
+	if (g_IsTerminal==-1)
+	{
+		// Check if stdout is a terminal
+#ifdef WIN32
+		g_IsTerminal = _isatty(_fileno(stdout)) ? 1 : 0;
+#else
+		g_IsTerminal = isatty(fileno(stdout)) ? 1 : 0;
+#endif
+	}
+	return g_IsTerminal!=0;
+}
+
 void textcolor(int attr/*=CN_NORMAL*/, int fg/*=CN_NO_COLOR*/, int bg/*=CN_NO_COLOR*/)
 {
+	if (!is_inside_terminal()) return;
+	
 #ifdef WIN32
 	int fg_win = -1;
 	int bg_win = -1;
